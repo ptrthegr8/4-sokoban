@@ -1,14 +1,24 @@
-* {
-margin: 0;
-padding: 0;
+#gameBoard {
+    margin: 0 auto;
 }
+
+#player {
+    background-image: url(stickman-pic.png);
+    width: 50px;
+    height: 50px;
+    /* position: absolute;
+    left: 100px;
+    top: 100px; */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
 html {
     min-width: 1059px;
     margin: 0;
-}
-
-#gameBoard {
-    margin: 0 auto;
 }
 
 .row {
@@ -21,7 +31,7 @@ html {
 }
 
 .wall {
-    background-color: red;
+    background-image: url(wall-pic.png);
 }
 
 .cell {
@@ -37,19 +47,10 @@ html {
     background-color: blue;
 }
 
-#player {
-    background-color: black;
-    width: 50px;
-    height: 50px;
-    position: absolute;
-    left: 100px;
-    top: 100px;
-}
-
 .already-boxed {
     background-color: gold;
 }
 
 .box-class {
-    background-color: brown;
+    background-image: url(box-pic.png);
 }
