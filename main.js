@@ -77,10 +77,12 @@ drawBoard()
 document.addEventListener('keydown', (event) => {
     const keyName = event.key;
     console.log(mapAltered);
-    console.log('key: ' + keyName);
+    console.log(keyName);
+    console.log(tempVar);
+    console.log(mapAltered[posY][posX])
     // RIGHT ARROW
-    if (keyName === "ArrowRight" && tempVar === false) {
-        if (mapAltered[posY][posX] === "S") {
+    if (keyName === "ArrowRight") {
+        if (mapAltered[posY][posX] === "S" && tempVar === false) {
             // moves box if next space is empty
             if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === " ") {
                 mapAltered[posY][posX] = " ";
@@ -246,8 +248,7 @@ document.addEventListener('keydown', (event) => {
                 posY++;
                 drawBoard();
             } else if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === "O") {
-                //moves player to empty storage location***
-                tempVar = true;
+                //moves box to empty storage location***
                 mapAltered[posY][posX] = " ";
                 mapAltered[posY + 1][posX] = "S";
                 mapAltered[posY + 2][posX] = "X";
