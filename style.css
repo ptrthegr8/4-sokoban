@@ -1,6 +1,5 @@
-#gameBoard {
-    
-}
+#gameBoard {}
+
 body {
     padding: 10px;
     margin: 0 auto;
@@ -12,15 +11,8 @@ body {
     height: 50px;
 }
 
-* {
-    /* margin: 0;
-    padding: 0; */
-}
-
-
 .row {
     display: flex;
-    
 }
 
 .column {
@@ -37,16 +29,12 @@ body {
     height: 50px;
 }
 
-.start {
-    background-color: green;
-}
-
 .finish {
-    background-color: blue;
+    background-image: url(target-pic.png);
 }
 
 .already-boxed {
-    background-color: gold;
+    background-image: url(placed-box-pic.png);
 }
 
 .box-class {

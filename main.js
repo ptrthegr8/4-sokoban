@@ -3,6 +3,7 @@ let playerDiv = document.getElementById("player");
 let posX = 2;
 let posY = 2;
 let tempVar = false;
+
 var map = [
     "  WWWWW ",
     "WWW   W ",
@@ -19,7 +20,6 @@ let mapAltered = [];
 for (let i = 0; i < map.length; i++) {
     mapAltered.push(map[i].split(""));
 }
-console.log(mapAltered);
 //LEGEND
 // "W" is a wall.
 // "S" is the player's starting position and the player character.
@@ -79,7 +79,7 @@ document.addEventListener('keydown', (event) => {
     console.log(mapAltered);
     console.log(keyName);
     console.log(tempVar);
-    console.log(mapAltered[posY][posX])
+    console.log(mapAltered[posY][posX]);
     // RIGHT ARROW
     if (keyName === "ArrowRight") {
         if (mapAltered[posY][posX] === "S" && tempVar === false) {
@@ -109,7 +109,7 @@ document.addEventListener('keydown', (event) => {
                 mapAltered[posY][posX + 1] = "S";
                 posX++;
                 drawBoard();
-            } else if (mapAltered[posY][posX + 1] === "X" && mapAltered[posY][pos + 2] === " ") {
+            } else if (mapAltered[posY][posX + 1] === "X" && mapAltered[posY][posX + 2] === " ") {
                 //moves box from filled storage location ***
                 tempVar = true;
                 mapAltered[posY][posX] = " ";
@@ -118,6 +118,7 @@ document.addEventListener('keydown', (event) => {
                 posX++;
                 drawBoard();
             }
+           // IF PLAYER COMES FROM EMPTY STORAGE
         } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
             if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === " ") {
                 mapAltered[posY][posX + 2] = "B";
@@ -371,4 +372,25 @@ document.addEventListener('keydown', (event) => {
         }
     }
     //
+    function winnerChickenDinner() {
+        let isThereAWinner = false;
+        for (let i=0; i < mapAltered.length; i++) {
+            if (mapAltered[i].indexOf("B") > -1) {
+                isThereAWinner = true;
+            }
+        }
+        return isThereAWinner;
+    }
+    if (winnerChickenDinner() === false) {
+        setTimeout(function () {
+            alert("You are the Soko-man!");
+            mapAltered = [];
+            for (let i = 0; i < map.length; i++) {
+                mapAltered.push(map[i].split(""));
+            }
+            posY = 2;
+            posX = 2;
+            drawBoard();
+        }, 1);
+    }
 });
