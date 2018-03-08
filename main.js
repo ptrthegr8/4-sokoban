@@ -1,20 +1,8 @@
 let gameBoard = document.getElementById("gameBoard");
 let playerDiv = document.getElementById("player");
-
 let posX = 2;
 let posY = 2;
-let tempVar = ""
-// const map = [
-//     "  WWWWW ",
-//     "WWW   W ",
-//     "WOSB  W ",
-//     "WWW BOW ",
-//     "WOWWB W ",
-//     "W W O WW",
-//     "WB XBBOW",
-//     "W   O  W",
-//     "WWWWWWWW"
-// ];
+let tempVar = false;
 var map = [
     "  WWWWW ",
     "WWW   W ",
@@ -91,7 +79,7 @@ document.addEventListener('keydown', (event) => {
     console.log(mapAltered);
     console.log('key: ' + keyName);
     // RIGHT ARROW
-    if (keyName === "ArrowRight") {
+    if (keyName === "ArrowRight" && tempVar === false) {
         if (mapAltered[posY][posX] === "S") {
             // moves box if next space is empty
             if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === " ") {
@@ -113,12 +101,58 @@ document.addEventListener('keydown', (event) => {
                 mapAltered[posY][posX + 2] = "X";
                 posX++;
                 drawBoard();
+            } else if (mapAltered[posY][posX + 1] === "O") { //moves player to empty storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY][posX + 1] = "S";
+                posX++;
+                drawBoard();
+            } else if (mapAltered[posY][posX + 1] === "X" && mapAltered[posY][pos + 2] === " ") {
+                //moves box from filled storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY][posX + 1] = "S";
+                mapAltered[posY][posX + 2] = "B";
+                posX++;
+                drawBoard();
+            }
+        } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
+            if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === " ") {
+                mapAltered[posY][posX + 2] = "B";
+                mapAltered[posY][posX + 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX++;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === "O") {
+                // move box from storage
+                mapAltered[posY][posX + 2] = "X";
+                mapAltered[posY][posX + 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX++;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY][posX + 1] === " ") {
+                // move to empty floor
+                mapAltered[posY][posX + 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX++;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY][posX + 1] === "O") {
+                // move player from empty storage
+                mapAltered[posY][posX + 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX++;
+                tempVar = false;
+                drawBoard();
             }
         }
+
     }
     // LEFT ARROW
     if (keyName === "ArrowLeft") {
-        if (mapAltered[posY][posX] === "S") {
+        if (mapAltered[posY][posX] === "S" && tempVar === false) {
             //moves player to empty space
             if (mapAltered[posY][posX - 1] === " ") {
                 mapAltered[posY][posX] = " ";
@@ -139,13 +173,59 @@ document.addEventListener('keydown', (event) => {
                 mapAltered[posY][posX - 2] = "X";
                 posX--;
                 drawBoard();
+            } else if (mapAltered[posY][posX - 1] === "O") { //moves player to empty storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY][posX - 1] = "S";
+                posX--;
+                drawBoard();
 
+            } else if (mapAltered[posY][posX - 1] === "X" && mapAltered[posY][posX - 2] === " ") {
+                //moves box from filled storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY][posX - 1] = "S";
+                mapAltered[posY][posX - 2] = "B";
+                posX--;
+                drawBoard();
+            }
+            // IF PLAYER COMES FROM EMPTY STORAGE
+        } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
+            if (mapAltered[posY][posX - 1] === "B" && mapAltered[posY][posX - 2] === " ") {
+                mapAltered[posY][posX - 2] = "B";
+                mapAltered[posY][posX - 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX--;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY][posX - 1] === "B" && mapAltered[posY][posX - 2] === "O") {
+                // move box from storage
+                mapAltered[posY][posX - 2] = "X";
+                mapAltered[posY][posX - 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX--;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY][posX - 1] === " ") {
+                // move to empty floor
+                mapAltered[posY][posX - 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX--;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY][posX - 1] === "O") {
+                // move player from empty storage
+                mapAltered[posY][posX - 1] = "S";
+                mapAltered[posY][posX] = "O";
+                posX--;
+                tempVar = false;
+                drawBoard();
             }
         }
     }
     // DOWN ARROW
     if (keyName === "ArrowDown") {
-        if (mapAltered[posY][posX] === "S") {
+        if (mapAltered[posY][posX] === "S" && tempVar === false) {
             // moves player down to empty space
             if (mapAltered[posY + 1][posX] === " ") {
                 mapAltered[posY + 1][posX] = "S";
@@ -153,7 +233,7 @@ document.addEventListener('keydown', (event) => {
                 posY++;
                 drawBoard();
             } else if (mapAltered[posY + 1][posX] === "O") { //moves player to empty storage location ***
-                tempVar = "O";
+                tempVar = true;
                 mapAltered[posY][posX] = " ";
                 mapAltered[posY + 1][posX] = "S";
                 posY++;
@@ -166,18 +246,60 @@ document.addEventListener('keydown', (event) => {
                 posY++;
                 drawBoard();
             } else if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === "O") {
-                //moves player to empty storage location
+                //moves player to empty storage location***
+                tempVar = true;
                 mapAltered[posY][posX] = " ";
                 mapAltered[posY + 1][posX] = "S";
                 mapAltered[posY + 2][posX] = "X";
                 posY++;
+                drawBoard();
+            } else if (mapAltered[posY + 1][posX] === "X" && mapAltered[posY + 2][posX] === " ") {
+                //moves box from filled storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY + 1][posX] = "S";
+                mapAltered[posY + 2][posX] = "B";
+                posY++;
+                drawBoard();
+            }
+        }
+        // IF PLAYER COMES FROM EMPTY STORAGE
+        else if (mapAltered[posY][posX] === "S" && tempVar === true) {
+            if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === " ") {
+                mapAltered[posY + 2][posX] = "B";
+                mapAltered[posY + 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY++;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === "O") {
+                // move box from storage
+                mapAltered[posY + 2][posX] = "X";
+                mapAltered[posY + 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY++;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY + 1][posX] === " ") {
+                // move to empty floor
+                mapAltered[posY + 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY++;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY + 1][posX] === "O") {
+                // move player from empty storage
+                mapAltered[posY + 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY++;
+                tempVar = false;
                 drawBoard();
             }
         }
     }
     // UP ARROW
     if (keyName === "ArrowUp") {
-        if (mapAltered[posY][posX] === "S") {
+        if (mapAltered[posY][posX] === "S" && tempVar === false) {
             //moves player to empty space
             if (mapAltered[posY - 1][posX] === " ") {
                 mapAltered[posY - 1][posX] = "S";
@@ -192,11 +314,57 @@ document.addEventListener('keydown', (event) => {
                 posY--;
                 drawBoard();
             } else if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === "O") {
-                //moves player to empty storage location
+                //moves box to empty storage location
                 mapAltered[posY][posX] = " ";
                 mapAltered[posY - 1][posX] = "S";
                 mapAltered[posY - 2][posX] = "X";
                 posY--;
+                drawBoard();
+            } else if (mapAltered[posY - 1][posX] === "O") { //moves player to empty storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY - 1][posX] = "S";
+                posY--;
+                drawBoard();
+            } else if (mapAltered[posY - 1][posX] === "X" && mapAltered[posY - 2][posX] === " ") {
+                //moves box from filled storage location ***
+                tempVar = true;
+                mapAltered[posY][posX] = " ";
+                mapAltered[posY - 1][posX] = "S";
+                mapAltered[posY - 2][posX] = "B";
+                posY--;
+                drawBoard();
+            }
+            // IF PLAYER COMES FROM EMPTY STORAGE
+        } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
+            if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === " ") {
+                mapAltered[posY - 2][posX] = "B";
+                mapAltered[posY - 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY--;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === "O") {
+                // move box from storage
+                mapAltered[posY - 2][posX] = "X";
+                mapAltered[posY - 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY--;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY - 1][posX] === " ") {
+                // move to empty floor
+                mapAltered[posY - 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY--;
+                tempVar = false;
+                drawBoard();
+            } else if (mapAltered[posY - 1][posX] === "O") {
+                // move player from empty storage
+                mapAltered[posY - 1][posX] = "S";
+                mapAltered[posY][posX] = "O";
+                posY--;
+                tempVar = false;
                 drawBoard();
             }
         }
