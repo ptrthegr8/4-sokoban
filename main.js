@@ -11,20 +11,6 @@ var map = [
     "W   O  W",
     "WWWWWWWW"
 ];
-// var map = [
-//     "    WWWWW          ",
-//     "    W   W          ",
-//     "    WB  W          ",
-//     "  WWW  BWW         ",
-//     "  W  B B W         ",
-//     "WWW W WW W   WWWWWW",
-//     "W   W WW WWWWW  OOW",
-//     "W B  B          OOW",
-//     "WWWWW WWW WSWW  OOW",
-//     "    W     WWWWWWWWW",
-//     "    WWWWWWW        "
-//  ]
-//
 //MAKES NESTED ARRAY 
 let mapAltered = [];
 for (let i = 0; i < map.length; i++) {
@@ -33,50 +19,49 @@ for (let i = 0; i < map.length; i++) {
 let playerPosition = [];
 let boxPositions = [];
 let targetPositions = [];
-//LEGEND
-// "W" is a wall.
-// "S" is the player's starting position and the player character.
-// " " spaces are open floor.
-// "O" is an initially empty storage location.
-// "B" is the starting position of a box/crate.
-// "X" is a storage location that starts with a box already on it.
 //DRAWS BOARD
-function drawBoard() {
-    document.getElementById("gameBoard").innerHTML = "";
-    for (let r = 0; r < mapAltered.length; r++) {
-        let row = document.createElement("div");
-        row.classList.add("row");
-        for (let c = 0; c < mapAltered[r].length; c++) {
-            switch (mapAltered[r][c]) {
-                case "W":
+    function drawBoard() {
+        document.getElementById("gameBoard").innerHTML = "";
+        for (let r = 0; r < mapAltered.length; r++) {
+            let row = document.createElement("div");
+            row.classList.add("row");
+            for (let c = 0; c < mapAltered[r].length; c++) {
+                switch (mapAltered[r][c]) {
+                    // "W" is a wall.
+                    case "W":
                     let wall = document.createElement("div");
-                    wall.classList.add("wall", "cell", "column");
+                    wall.classList.add("wall", "cell");
                     row.appendChild(wall);
                     break;
-                case "O":
+                    // "O" is an initially empty storage location.
+                    case "O":
                     let finish = document.createElement("div");
-                    finish.classList.add("finish", "cell", "column");
+                    finish.classList.add("finish", "cell");
                     row.appendChild(finish);
                     break;
-                case "S":
+                    // "S" is the player's starting position and the player character.
+                    case "S":
                     let playerDiv = document.createElement("div");
-                    playerDiv.classList.add("cell", "column");
+                    playerDiv.classList.add("cell");
                     playerDiv.setAttribute("id", "player");
                     row.appendChild(playerDiv);
                     break;
-                case "X":
+                    // "X" is a storage location that starts with a box already on it.
+                    case "X":
                     let alreadyBoxed = document.createElement("div");
-                    alreadyBoxed.classList.add("cell", "column", "already-boxed");
+                    alreadyBoxed.classList.add("cell", "already-boxed");
                     row.appendChild(alreadyBoxed);
                     break;
-                case "B":
+                    // "B" is the starting position of a box/crate.
+                    case "B":
                     let box = document.createElement("div");
-                    box.classList.add("cell", "column", "box-class");
+                    box.classList.add("cell", "box-class");
                     row.appendChild(box);
                     break;
-                case " ":
+                    // " " spaces are open floor.
+                    case " ":
                     let empty = document.createElement("div");
-                    empty.classList.add("cell", "column");
+                    empty.classList.add("cell");
                     row.appendChild(empty);
             }
         }
