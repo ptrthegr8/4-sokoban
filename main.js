@@ -1,9 +1,5 @@
 let gameBoard = document.getElementById("gameBoard");
-let playerDiv = document.getElementById("player");
-let posX = 2;
-let posY = 2;
-let tempVar = false;
-
+let playerGoesThroughGoal = false;
 var map = [
     "  WWWWW ",
     "WWW   W ",
@@ -15,11 +11,28 @@ var map = [
     "W   O  W",
     "WWWWWWWW"
 ];
-//MAKES NESTED ARRAY
+// var map = [
+//     "    WWWWW          ",
+//     "    W   W          ",
+//     "    WB  W          ",
+//     "  WWW  BWW         ",
+//     "  W  B B W         ",
+//     "WWW W WW W   WWWWWW",
+//     "W   W WW WWWWW  OOW",
+//     "W B  B          OOW",
+//     "WWWWW WWW WSWW  OOW",
+//     "    W     WWWWWWWWW",
+//     "    WWWWWWW        "
+//  ]
+//
+//MAKES NESTED ARRAY 
 let mapAltered = [];
 for (let i = 0; i < map.length; i++) {
     mapAltered.push(map[i].split(""));
 }
+let playerPosition = [];
+let boxPositions = [];
+let targetPositions = [];
 //LEGEND
 // "W" is a wall.
 // "S" is the player's starting position and the player character.
@@ -70,316 +83,152 @@ function drawBoard() {
         gameBoard.appendChild(row);
     }
 }
-//
-
-drawBoard()
-//KEYBOARD LOGIC 
-document.addEventListener('keydown', (event) => {
-    const keyName = event.key;
-    console.log(mapAltered);
-    console.log(keyName);
-    console.log(tempVar);
-    console.log(mapAltered[posY][posX]);
-    // RIGHT ARROW
-    if (keyName === "ArrowRight") {
-        if (mapAltered[posY][posX] === "S" && tempVar === false) {
-            // moves box if next space is empty
-            if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === " ") {
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX + 1] = "S";
-                mapAltered[posY][posX + 2] = "B";
-                posX++;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === " ") {
+//calls function to initialize board
+drawBoard();
+//checks for winner
+function winnerChickenDinner() {
+    let isThereAWinner = false;
+    for (let i = 0; i < mapAltered.length; i++) {
+        if (mapAltered[i].indexOf("B") > -1) {
+            isThereAWinner = true;
+        }
+    }
+    return isThereAWinner;
+}
+//function to determine if can move and where 
+function move(destRow, destCol, keyDirection) {
+    let playerRow = playerPosition[0];
+    let playerCol = playerPosition[1];
+    let rowAheadOne = playerRow + destRow;
+    let rowAheadTwo = playerRow + (destRow + destRow);
+    let columnAheadOne = playerCol + destCol;
+    let columnAheadTwo = playerCol + (destCol + destCol);
+    // right and left arrows
+    switch (keyDirection) {
+        case "rightLeft":
+            if (playerGoesThroughGoal === false) {
+                // moves box if next space is empty
+                if (mapAltered[playerRow][columnAheadOne] === "B" && mapAltered[playerRow][columnAheadTwo] === " ") {
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    mapAltered[playerRow][columnAheadTwo] = "B";
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === " ") {
+                    //moves player to empty space
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === "B" && mapAltered[playerRow][columnAheadTwo] === "O") {
+                    //moves box to empty storage location
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[playerRow][columnAheadOne] = "S"
+                    mapAltered[playerRow][columnAheadTwo] = "X";
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === "O") { //moves player to empty storage location ***
+                    playerGoesThroughGoal = true;
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === "X" && mapAltered[playerRow][columnAheadTwo] === " ") {
+                    //moves box from filled storage location ***
+                    playerGoesThroughGoal = true;
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    mapAltered[playerRow][columnAheadTwo] = "B";
+                    drawBoard();
+                }
+                // IF PLAYER COMES FROM EMPTY STORAGE
+            } else if (playerGoesThroughGoal === true) {
+                if (mapAltered[playerRow][columnAheadOne] === "B" && mapAltered[playerRow][columnAheadTwo] === " ") {
+                    mapAltered[playerRow][columnAheadTwo] = "B";
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === "B" && mapAltered[playerRow][columnAheadTwo] === "O") {
+                    // move box from storage
+                    mapAltered[playerRow][columnAheadTwo] = "X";
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === " ") {
+                    // move to empty floor
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                } else if (mapAltered[playerRow][columnAheadOne] === "O") {
+                    // move player from empty storage
+                    mapAltered[playerRow][columnAheadOne] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                }
+            }
+            break;
+        case "upDown":
+            // up and down arrows
+            if (playerGoesThroughGoal === false) {
                 //moves player to empty space
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX + 1] = "S";
-                posX++;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === "O") {
-                //moves box to empty storage location
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX + 1] = "S"
-                mapAltered[posY][posX + 2] = "X";
-                posX++;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === "O") { //moves player to empty storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX + 1] = "S";
-                posX++;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === "X" && mapAltered[posY][posX + 2] === " ") {
-                //moves box from filled storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX + 1] = "S";
-                mapAltered[posY][posX + 2] = "B";
-                posX++;
-                drawBoard();
+                if (mapAltered[rowAheadOne][playerCol] === " ") {
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[playerRow][playerCol] = " ";
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === "B" && mapAltered[rowAheadTwo][playerCol] === " ") {
+                    //moves box if next cell is empty
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[rowAheadTwo][playerCol] = "B";
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === "B" && mapAltered[rowAheadTwo][playerCol] === "O") {
+                    //moves box to empty storage location
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[rowAheadTwo][playerCol] = "X";
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === "O") { //moves player to empty storage location ***
+                    playerGoesThroughGoal = true;
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === "X" && mapAltered[rowAheadTwo][playerCol] === " ") {
+                    //moves box from filled storage location ***
+                    playerGoesThroughGoal = true;
+                    mapAltered[playerRow][playerCol] = " ";
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[rowAheadTwo][playerCol] = "B";
+                    drawBoard();
+                }
+                // IF PLAYER COMES FROM EMPTY STORAGE
+            } else if (playerGoesThroughGoal === true) {
+                if (mapAltered[rowAheadOne][playerCol] === "B" && mapAltered[rowAheadTwo][playerCol] === " ") {
+                    mapAltered[rowAheadTwo][playerCol] = "B";
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === "B" && mapAltered[rowAheadTwo][playerCol] === "O") {
+                    // move box from storage
+                    mapAltered[rowAheadTwo][playerCol] = "X";
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === " ") {
+                    // move to empty floor
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                } else if (mapAltered[rowAheadOne][playerCol] === "O") {
+                    // move player from empty storage
+                    mapAltered[rowAheadOne][playerCol] = "S";
+                    mapAltered[playerRow][playerCol] = "O";
+                    playerGoesThroughGoal = false;
+                    drawBoard();
+                }
             }
-           // IF PLAYER COMES FROM EMPTY STORAGE
-        } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
-            if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === " ") {
-                mapAltered[posY][posX + 2] = "B";
-                mapAltered[posY][posX + 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX++;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === "B" && mapAltered[posY][posX + 2] === "O") {
-                // move box from storage
-                mapAltered[posY][posX + 2] = "X";
-                mapAltered[posY][posX + 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX++;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === " ") {
-                // move to empty floor
-                mapAltered[posY][posX + 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX++;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY][posX + 1] === "O") {
-                // move player from empty storage
-                mapAltered[posY][posX + 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX++;
-                tempVar = false;
-                drawBoard();
-            }
-        }
-
-    }
-    // LEFT ARROW
-    if (keyName === "ArrowLeft") {
-        if (mapAltered[posY][posX] === "S" && tempVar === false) {
-            //moves player to empty space
-            if (mapAltered[posY][posX - 1] === " ") {
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX - 1] = "S";
-                posX--;
-                drawBoard();
-            } else if (mapAltered[posY][posX - 1] === "B" && mapAltered[posY][posX - 2] === " ") {
-                //moves box if next cell is empty
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX - 1] = "S";
-                mapAltered[posY][posX - 2] = "B";
-                posX--;
-                drawBoard();
-            } else if (mapAltered[posY][posX - 1] === "B" && mapAltered[posY][posX - 2] === "O") {
-                //moves box to empty storage location
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX - 1] = "S"
-                mapAltered[posY][posX - 2] = "X";
-                posX--;
-                drawBoard();
-            } else if (mapAltered[posY][posX - 1] === "O") { //moves player to empty storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX - 1] = "S";
-                posX--;
-                drawBoard();
-
-            } else if (mapAltered[posY][posX - 1] === "X" && mapAltered[posY][posX - 2] === " ") {
-                //moves box from filled storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY][posX - 1] = "S";
-                mapAltered[posY][posX - 2] = "B";
-                posX--;
-                drawBoard();
-            }
-            // IF PLAYER COMES FROM EMPTY STORAGE
-        } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
-            if (mapAltered[posY][posX - 1] === "B" && mapAltered[posY][posX - 2] === " ") {
-                mapAltered[posY][posX - 2] = "B";
-                mapAltered[posY][posX - 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX--;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY][posX - 1] === "B" && mapAltered[posY][posX - 2] === "O") {
-                // move box from storage
-                mapAltered[posY][posX - 2] = "X";
-                mapAltered[posY][posX - 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX--;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY][posX - 1] === " ") {
-                // move to empty floor
-                mapAltered[posY][posX - 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX--;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY][posX - 1] === "O") {
-                // move player from empty storage
-                mapAltered[posY][posX - 1] = "S";
-                mapAltered[posY][posX] = "O";
-                posX--;
-                tempVar = false;
-                drawBoard();
-            }
-        }
-    }
-    // DOWN ARROW
-    if (keyName === "ArrowDown") {
-        if (mapAltered[posY][posX] === "S" && tempVar === false) {
-            // moves player down to empty space
-            if (mapAltered[posY + 1][posX] === " ") {
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY][posX] = " ";
-                posY++;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === "O") { //moves player to empty storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY + 1][posX] = "S";
-                posY++;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === " ") {
-                //moves box if next cell is empty
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY + 2][posX] = "B";
-                posY++;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === "O") {
-                //moves box to empty storage location***
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY + 2][posX] = "X";
-                posY++;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === "X" && mapAltered[posY + 2][posX] === " ") {
-                //moves box from filled storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY + 2][posX] = "B";
-                posY++;
-                drawBoard();
-            }
-        }
-        // IF PLAYER COMES FROM EMPTY STORAGE
-        else if (mapAltered[posY][posX] === "S" && tempVar === true) {
-            if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === " ") {
-                mapAltered[posY + 2][posX] = "B";
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY++;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === "B" && mapAltered[posY + 2][posX] === "O") {
-                // move box from storage
-                mapAltered[posY + 2][posX] = "X";
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY++;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === " ") {
-                // move to empty floor
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY++;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY + 1][posX] === "O") {
-                // move player from empty storage
-                mapAltered[posY + 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY++;
-                tempVar = false;
-                drawBoard();
-            }
-        }
-    }
-    // UP ARROW
-    if (keyName === "ArrowUp") {
-        if (mapAltered[posY][posX] === "S" && tempVar === false) {
-            //moves player to empty space
-            if (mapAltered[posY - 1][posX] === " ") {
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY][posX] = " ";
-                posY--;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === " ") {
-                //moves box if next cell is empty
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY - 2][posX] = "B";
-                posY--;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === "O") {
-                //moves box to empty storage location
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY - 2][posX] = "X";
-                posY--;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === "O") { //moves player to empty storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY - 1][posX] = "S";
-                posY--;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === "X" && mapAltered[posY - 2][posX] === " ") {
-                //moves box from filled storage location ***
-                tempVar = true;
-                mapAltered[posY][posX] = " ";
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY - 2][posX] = "B";
-                posY--;
-                drawBoard();
-            }
-            // IF PLAYER COMES FROM EMPTY STORAGE
-        } else if (mapAltered[posY][posX] === "S" && tempVar === true) {
-            if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === " ") {
-                mapAltered[posY - 2][posX] = "B";
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY--;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === "B" && mapAltered[posY - 2][posX] === "O") {
-                // move box from storage
-                mapAltered[posY - 2][posX] = "X";
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY--;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === " ") {
-                // move to empty floor
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY--;
-                tempVar = false;
-                drawBoard();
-            } else if (mapAltered[posY - 1][posX] === "O") {
-                // move player from empty storage
-                mapAltered[posY - 1][posX] = "S";
-                mapAltered[posY][posX] = "O";
-                posY--;
-                tempVar = false;
-                drawBoard();
-            }
-        }
-    }
-    //
-    function winnerChickenDinner() {
-        let isThereAWinner = false;
-        for (let i=0; i < mapAltered.length; i++) {
-            if (mapAltered[i].indexOf("B") > -1) {
-                isThereAWinner = true;
-            }
-        }
-        return isThereAWinner;
     }
     if (winnerChickenDinner() === false) {
         setTimeout(function () {
@@ -388,9 +237,47 @@ document.addEventListener('keydown', (event) => {
             for (let i = 0; i < map.length; i++) {
                 mapAltered.push(map[i].split(""));
             }
-            posY = 2;
-            posX = 2;
             drawBoard();
-        }, 1);
+        }, 100);
+    }
+}
+// event handler for key presses
+document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+    playerPosition = [];
+    boxPositions = [];
+    targetPositions = [];
+    // finds player row and column and pushes to array 
+    for (let i = 0; i < mapAltered.length; i++) {
+        if (mapAltered[i].indexOf("S") > -1) {
+            playerPosition.push(i, mapAltered[i].indexOf("S"))
+        }
+    };
+    console.log(playerPosition);
+    for (let i = 0; i < mapAltered.length; i++) {
+        for (let j = 0; j < mapAltered[i].length; j++) {
+            // finds box row and column --> pushes to array
+            if (mapAltered[i][j] === "B") {
+                boxPositions.push(i, j)
+            // finds target row and column --> pushes to array
+            } else if ((mapAltered[i][j] === "O")) {
+                targetPositions.push(i, j)
+            }
+        }
+    };
+    // executes move according to key pressed
+    switch (keyName) {
+        case "ArrowRight":
+            move(0, 1, "rightLeft");
+            break;
+        case "ArrowLeft":
+            move(0, -1, "rightLeft");
+            break;
+        case "ArrowDown":
+            move(1, 0, "upDown");
+            break;
+        case "ArrowUp":
+            move(-1, 0, "upDown");
     }
 });
+//
